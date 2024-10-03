@@ -1,5 +1,5 @@
 # Hi there, I'm Baman - aka MrTrotid <img width="30px" height="30" src="https://github.com/SatYu26/SatYu26/raw/master/Assets/Hi.gif" />
-<img align="right" alt="GIF" height="160px" src="https://octodex.github.com/images/daftpunktocat-guy.gif" />
+<img align="right" alt="GIF" height="160px" src="https://media.giphy.com/media/QsKdQidXLVqPS/giphy.gif?cid=82a1493b3kbni0g2jyq87nvye8j1ilnrx2x64qg4fccnr7xg&ep=v1_stickers_trending&rid=giphy.gif&ct=s" />
 
 
 
