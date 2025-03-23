@@ -9,7 +9,7 @@
 
 - 🌱 I’m currently learning **Cybersecurity**
 
-- 👨‍💻 All of my projects are available at [bamanguragain.com.np](bamanguragain.com.np)
+- 👨‍💻 All of my projects are available at [bamanguragain.com.np](www.bamanguragain.com.np)
 
 - 📫 How to reach me **bamanguragain@gmail.com**
 
