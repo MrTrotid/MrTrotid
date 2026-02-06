@@ -16,7 +16,14 @@
 ```
 $ whoami
 mrtrotid
+```
 
+</div>
+
+<table width="100%" cellspacing="0" cellpadding="0">
+	<tr>
+		<td bgcolor="#0b1f0b">
+			<pre>
 $ cat /etc/profile.d/about
 I’m currently learning Cybersecurity.
 I make random things that I like — most of the time it’s just vibe coding.
@@ -37,21 +44,12 @@ Learning   : Cybersecurity
 Building   : random things I like
 Exploring  : terminal UIs and automation
 
-$ ping social
-GitHub  : https://github.com/mrtrotid
-LinkedIn: https://linkedin.com/in/mrtrotid
-X       : https://x.com/mrtrotid
-YouTube : https://youtube.com/@mrtrotid
-Email   : contact@bamanguragain.com.np
-
-$ open projects
-Terminalfolio   : a CLI-style portfolio site
-Fluxboard       : minimal, fast task board
-Pinegraph       : tiny graph viz toolkit
-
 $ exit
 logout
-```
+			</pre>
+		</td>
+	</tr>
+</table>
 
 ## > Socials
 
@@ -73,17 +71,8 @@ logout
 ![Nginx](https://img.shields.io/badge/nginx-%23009639.svg?style=plastic&logo=nginx&logoColor=white)
 ![Firebase](https://img.shields.io/badge/firebase-a08021?style=plastic&logo=firebase&logoColor=ffcd34)
 ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=plastic&logo=supabase&logoColor=white)
-![Canva](https://img.shields.io/badge/Canva-%2300C4CC.svg?style=plastic&logo=Canva&logoColor=white)
-![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=plastic&logo=figma&logoColor=white)
-![Framer](https://img.shields.io/badge/Framer-black?style=plastic&logo=framer&logoColor=blue)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=plastic&logo=git&logoColor=white)
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=plastic&logo=github&logoColor=white)
-![Bitwarden](https://img.shields.io/badge/bitwarden-%23175DDC.svg?style=plastic&logo=bitwarden&logoColor=white)
-![Cisco](https://img.shields.io/badge/cisco-%23049fd9.svg?style=plastic&logo=cisco&logoColor=black)
-![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=plastic&logo=notion&logoColor=white)
-![Raspberry Pi](https://img.shields.io/badge/-Raspberry_Pi-C51A4A?style=plastic&logo=Raspberry-Pi)
-![Arduino](https://img.shields.io/badge/-Arduino-00979D?style=plastic&logo=Arduino&logoColor=white)
-![TOR](https://img.shields.io/badge/tor-%237E4798.svg?style=plastic&logo=tor-project&logoColor=white)
 
 ## > GitHub Stats
 
@@ -99,6 +88,8 @@ logout
 
 ---
 [![](https://visitcount.itsvg.in/api?id=MrTrotid&icon=4&color=0)](https://visitcount.itsvg.in)
+
+<div align="center">
 
 ```
 $ printf "thanks for stopping by"
