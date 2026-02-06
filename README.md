@@ -28,6 +28,8 @@ $ cat /etc/profile.d/about
 I’m currently learning Cybersecurity.
 I make random things that I like — most of the time it’s just vibe coding.
 
+
+
 $ skills --list
 Languages   : JavaScript, Python, PowerShell
 Frontend    : React, Next.js
