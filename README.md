@@ -1,3 +1,5 @@
+<div align="center">
+
 # > hello, i'm mrtrotid
 
 ```
@@ -102,3 +104,5 @@ logout
 $ printf "thanks for stopping by"
 thanks for stopping by
 ```
+
+</div>
