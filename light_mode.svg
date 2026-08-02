@@ -53,7 +53,7 @@
         <tspan x="860" y="30">baman+prasad@guragain</tspan>
 
         <tspan x="860" y="50" class="cc">. </tspan><tspan class="key">OS</tspan>:<tspan class="cc"> ........................................ </tspan><tspan class="value">Windows 11, Android 16, Linux</tspan>
-        <tspan x="860" y="70" class="cc">. </tspan><tspan class="key">Uptime</tspan>:<tspan class="cc"> ..................................... </tspan><tspan class="value" id="age_data">18 years, 08 months, 27 days</tspan>
+        <tspan x="860" y="70" class="cc">. </tspan><tspan class="key">Uptime</tspan>:<tspan class="cc"> ..................................... </tspan><tspan class="value" id="age_data">18 years, 08 months, 28 days</tspan>
         <tspan x="860" y="90" class="cc">. </tspan><tspan class="key">Host</tspan>:<tspan class="cc"> ........................................................... </tspan><tspan class="value">MrTrotid</tspan>
         <tspan x="860" y="110" class="cc">. </tspan><tspan class="key">Kernel</tspan>:<tspan class="cc"> ......................................... </tspan><tspan class="value">Student, Tech Enthusiast</tspan>
 
@@ -87,7 +87,7 @@
 
         <tspan x="860" y="590" class="cc">. </tspan>
         <tspan x="860" y="610" class="cc">- GitHub Stats</tspan>
-        <tspan x="860" y="630" class="cc">. </tspan><tspan class="key">Repos</tspan>:<tspan class="cc" id="repo_data_dots"> ..................... </tspan><tspan class="value" id="repo_data">36</tspan> {<tspan class="key">Contributed</tspan>: <tspan class="value" id="contrib_data">37</tspan>} | <tspan class="key">Stars</tspan>:<tspan class="cc" id="star_data_dots"> ............. </tspan><tspan class="value" id="star_data">3</tspan>
+        <tspan x="860" y="630" class="cc">. </tspan><tspan class="key">Repos</tspan>:<tspan class="cc" id="repo_data_dots"> ..................... </tspan><tspan class="value" id="repo_data">37</tspan> {<tspan class="key">Contributed</tspan>: <tspan class="value" id="contrib_data">38</tspan>} | <tspan class="key">Stars</tspan>:<tspan class="cc" id="star_data_dots"> ............. </tspan><tspan class="value" id="star_data">3</tspan>
 
         <tspan x="860" y="650" class="cc">. </tspan><tspan class="key">Commits</tspan>:<tspan class="cc" id="commit_data_dots"> .................................... </tspan><tspan class="value" id="commit_data">313</tspan> | <tspan class="key">Followers</tspan>:<tspan class="cc" id="follower_data_dots"> ......... </tspan><tspan class="value" id="follower_data">4</tspan>
 
