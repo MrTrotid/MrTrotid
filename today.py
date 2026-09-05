@@ -93,7 +93,8 @@ def follower_getter(username):
         }
     }'''
     r = simple_request('follower_getter', query, {'login': username})
-    return int(r.json()['data']['user']['followers']['totalCount'])
+    user = (r.json().get('data') or {}).get('user') or {}
+    return int((user.get('followers') or {}).get('totalCount') or 0)
 
 
 def graph_repos_stars(count_type, owner_affiliation, cursor=None):
@@ -122,15 +123,22 @@ def graph_repos_stars(count_type, owner_affiliation, cursor=None):
         'cursor': cursor
     })
     if count_type == 'repos':
-        return r.json()['data']['user']['repositories']['totalCount']
+        return (r.json()['data']['user'] or {}).get('repositories', {}).get('totalCount', 0) or 0
     elif count_type == 'stars':
-        return stars_counter(r.json()['data']['user']['repositories']['edges'])
+        repos = (r.json()['data']['user'] or {}).get('repositories') or {}
+        return stars_counter(repos.get('edges') or [])
+    raise ValueError(f"graph_repos_stars: unknown count_type '{count_type}'")
 
 
 def stars_counter(data):
     total = 0
-    for node in data:
-        total += node['node']['stargazers']['totalCount']
+    for edge in data or []:
+        try:
+            node = (edge or {}).get('node') or {}
+            stargazers = node.get('stargazers') or {}
+            total += int(stargazers.get('totalCount') or 0)
+        except (TypeError, ValueError, AttributeError):
+            continue
     return total
 
 
@@ -174,13 +182,16 @@ def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None,
         'login': USER_NAME,
         'cursor': cursor
     })
-    repos = r.json()['data']['user']['repositories']
-    if repos['pageInfo']['hasNextPage']:
-        edges += repos['edges']
+    repos = (r.json()['data'] or {}).get('user') or {}
+    repos = repos.get('repositories') or {}
+    page = repos.get('pageInfo') or {}
+    batch = [e for e in (repos.get('edges') or []) if (e or {}).get('node')]
+    if page.get('hasNextPage'):
+        edges += batch
         return loc_query(owner_affiliation, comment_size, force_cache,
-                         repos['pageInfo']['endCursor'], edges)
+                         page.get('endCursor'), edges)
     else:
-        return cache_builder(edges + repos['edges'], comment_size, force_cache)
+        return cache_builder(edges + batch, comment_size, force_cache)
 
 
 def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
