@@ -2,13 +2,15 @@ import datetime
 from dateutil import relativedelta
 import requests
 import os
+import sys
 from lxml import etree
 import time
 import hashlib
 
-HEADERS = {'authorization': 'Bearer ' + os.environ['ACCESS_TOKEN']}
-USER_NAME = "MrTrotid"
-OWNER_ID = None  # set after user_getter runs
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN', '')
+HEADERS = {'authorization': 'Bearer ' + ACCESS_TOKEN} if ACCESS_TOKEN else {}
+USER_NAME = os.environ.get('USER_NAME') or os.environ.get('GITHUB_REPOSITORY_OWNER') or "MrTrotid"
+OWNER_ID = None  # set after user_getter runs (plain GraphQL id string)
 
 QUERY_COUNT = {
     'user_getter': 0,
@@ -77,7 +79,9 @@ def user_getter(username):
     }'''
     r = simple_request('user_getter', query, {'login': username})
     data = r.json()['data']['user']
-    return {'id': data['id']}, data['createdAt']
+    if data is None:
+        raise Exception(f"user_getter: user '{username}' not found. Check USER_NAME.", QUERY_COUNT)
+    return data['id'], data['createdAt']
 
 
 def follower_getter(username):
@@ -134,11 +138,13 @@ def stars_counter(data):
 # LOC (cache-based)
 # -----------------------------
 
-def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None, edges=[]):
+def loc_query(owner_affiliation, comment_size=0, force_cache=False, cursor=None, edges=None):
     """
     Queries all repositories and delegates LOC counting to cache_builder.
     Paginates in batches of 60 to avoid 502 timeouts.
     """
+    if edges is None:
+        edges = []
     query_count('loc_query')
     query = '''
     query($owner_affiliation: [RepositoryAffiliation], $login: String!, $cursor: String) {
@@ -207,19 +213,28 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
     data = data[comment_size:]
 
     for index in range(len(edges)):
-        repo_hash, commit_count, *__ = data[index].split()
+        parts = data[index].split()
+        if len(parts) < 2:
+            continue
+        repo_hash, commit_count = parts[0], parts[1]
         if repo_hash == hashlib.sha256(edges[index]['node']['nameWithOwner'].encode('utf-8')).hexdigest():
             try:
-                if int(commit_count) != edges[index]['node']['defaultBranchRef']['target']['history']['totalCount']:
-                    owner, repo_name = edges[index]['node']['nameWithOwner'].split('/')
+                ref = (edges[index]['node'].get('defaultBranchRef') or {})
+                target = (ref.get('target') or {})
+                history = (target.get('history') or {})
+                total = history.get('totalCount')
+                if total is None:
+                    raise TypeError('missing history totalCount')
+                if int(commit_count) != total:
+                    owner, repo_name = edges[index]['node']['nameWithOwner'].split('/', 1)
                     print(f"   updating LOC: {edges[index]['node']['nameWithOwner']}")
                     loc = recursive_loc(owner, repo_name, data, cache_comment)
                     data[index] = (
                         repo_hash + ' ' +
-                        str(edges[index]['node']['defaultBranchRef']['target']['history']['totalCount']) + ' ' +
+                        str(total) + ' ' +
                         str(loc[2]) + ' ' + str(loc[0]) + ' ' + str(loc[1]) + '\n'
                     )
-            except TypeError:
+            except (TypeError, KeyError, ValueError, AttributeError):
                 data[index] = repo_hash + ' 0 0 0 0\n'
 
     with open(filename, 'w') as f:
@@ -228,8 +243,13 @@ def cache_builder(edges, comment_size, force_cache, loc_add=0, loc_del=0):
 
     for line in data:
         loc = line.split()
-        loc_add += int(loc[3])
-        loc_del += int(loc[4])
+        if len(loc) < 5:
+            continue
+        try:
+            loc_add += int(loc[3])
+            loc_del += int(loc[4])
+        except ValueError:
+            continue
 
     return [loc_add, loc_del, loc_add - loc_del, cached]
 
@@ -301,14 +321,14 @@ def recursive_loc(owner, repo_name, data, cache_comment, addition_total=0, delet
         headers=HEADERS
     )
     if r.status_code == 200:
-        if r.json()['data']['repository']['defaultBranchRef'] is not None:
-            return loc_counter_one_repo(
-                owner, repo_name, data, cache_comment,
-                r.json()['data']['repository']['defaultBranchRef']['target']['history'],
-                addition_total, deletion_total, my_commits
-            )
-        else:
-            return 0
+        repo = r.json()['data']['repository']
+        if repo is None or repo.get('defaultBranchRef') is None:
+            return 0, 0, 0
+        return loc_counter_one_repo(
+            owner, repo_name, data, cache_comment,
+            repo['defaultBranchRef']['target']['history'],
+            addition_total, deletion_total, my_commits
+        )
     force_close_file(data, cache_comment)
     if r.status_code == 403:
         raise Exception('Rate limit hit! Too many requests in a short time.')
@@ -321,10 +341,15 @@ def loc_counter_one_repo(owner, repo_name, data, cache_comment, history, additio
     Recursively calls recursive_loc if there are more pages.
     """
     for node in history['edges']:
-        if node['node']['author']['user'] == OWNER_ID:
-            my_commits += 1
-            addition_total += node['node']['additions']
-            deletion_total += node['node']['deletions']
+        try:
+            author = (node.get('node') or {}).get('author') or {}
+            author_user = author.get('user') or {}
+            if author_user.get('id') is not None and author_user.get('id') == OWNER_ID:
+                my_commits += 1
+                addition_total += node['node'].get('additions', 0) or 0
+                deletion_total += node['node'].get('deletions', 0) or 0
+        except (TypeError, KeyError, AttributeError):
+            continue
 
     if history['edges'] == [] or not history['pageInfo']['hasNextPage']:
         return addition_total, deletion_total, my_commits
@@ -342,7 +367,16 @@ def commit_counter(comment_size):
     with open(filename, 'r') as f:
         data = f.readlines()
     data = data[comment_size:]
-    return sum(int(line.split()[2]) for line in data)
+    total = 0
+    for line in data:
+        parts = line.split()
+        if len(parts) < 3:
+            continue
+        try:
+            total += int(parts[2])
+        except ValueError:
+            continue
+    return total
 
 
 # -----------------------------
@@ -383,6 +417,11 @@ def svg_overwrite(filename, age_data, commit_data, star_data, repo_data, contrib
 # -----------------------------
 
 if __name__ == '__main__':
+
+    if not ACCESS_TOKEN:
+        print("Error: ACCESS_TOKEN environment variable is not set.", file=sys.stderr)
+        print("Set it via GitHub Actions secrets or: export ACCESS_TOKEN=<token>", file=sys.stderr)
+        sys.exit(1)
 
     print('Calculation times:')
 

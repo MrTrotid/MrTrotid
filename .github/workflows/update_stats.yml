@@ -7,6 +7,13 @@ on:
   # Allow manual triggering
   workflow_dispatch:
 
+permissions:
+  contents: write
+
+concurrency:
+  group: readme-build
+  cancel-in-progress: false
+
 jobs:
   update-stats:
     runs-on: ubuntu-latest
@@ -25,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install requests python-dateutil lxml
+          pip install -r requirements.txt
       
       - name: Run stats update script
         env:
@@ -37,6 +44,8 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add dark_mode.svg light_mode.svg cache/
+          git add dark_mode.svg light_mode.svg
+          git add -f cache/ || true
           git diff --quiet && git diff --staged --quiet || git commit -m "Update GitHub stats [skip ci]"
-          git push
+          git pull --rebase --autostash || true
+          git push || (git pull --rebase && git push)
